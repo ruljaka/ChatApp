@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "197883652224",
+    "firebase_url": "https://chatapp-1b9a4.firebaseio.com",
+    "project_id": "chatapp-1b9a4",
+    "storage_bucket": "chatapp-1b9a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197883652224:android:8876a12c95da926fff5e65",
+        "android_client_info": {
+          "package_name": "com.ruslangrigoriev.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "197883652224-n1cc9p2uqn46227nqpvbvhhpq7ia69ah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPEwQVCK8W4tOaPjWt9OsO4uOZFKUZk6o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "197883652224-n1cc9p2uqn46227nqpvbvhhpq7ia69ah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
