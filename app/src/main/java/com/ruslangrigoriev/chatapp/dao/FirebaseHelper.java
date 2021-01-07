@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -78,6 +79,7 @@ public class FirebaseHelper implements AuthService, DataService {
                             hashMap.put("id", userID);
                             hashMap.put("username", username);
                             hashMap.put("imageURL", "default");
+                            hashMap.put("search", username.toLowerCase());
 
                             usersReference.child(userID).setValue(hashMap)
                                     .addOnCompleteListener(task1 -> {
@@ -132,13 +134,13 @@ public class FirebaseHelper implements AuthService, DataService {
     }
 
 
-    @Override
+    /*@Override
     public void getContacts(GetContactsCallback contactsCallback) {
         List<User> users = new ArrayList<>();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        /*usersReference = FirebaseDatabase
+        *//*usersReference = FirebaseDatabase
                 .getInstance()
-                .getReference("Users");*/
+                .getReference("Users");*//*
 
         usersReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -159,6 +161,36 @@ public class FirebaseHelper implements AuthService, DataService {
                 Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
+    }*/
+
+    public void searchContacts(String s, GetContactsCallback contactsCallback){
+        List<User> users = new ArrayList<>();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        Query query = usersReference.orderByChild("search")
+                .startAt(s)
+                .endAt(s+"\uf8ff");
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                users.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if(user != null) {
+                        if (!user.getId().equals(firebaseUser.getUid())) {
+                            users.add(user);
+                        }
+                    }
+                }
+                contactsCallback.onChange(users);
+                Log.d(TAG, "onDataChange  searchContacts");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
 

@@ -4,7 +4,9 @@ import android.net.Uri;
 
 public interface DataService {
 
-    void getContacts(GetContactsCallback contactsCallback);
+    //void getContacts(GetContactsCallback contactsCallback);
+
+    void searchContacts(String s, GetContactsCallback getContactsCallback);
 
     void getUserByID(String userID, GetUserByIDCallback userByIDCallback);
 
@@ -17,4 +19,6 @@ public interface DataService {
     void uploadImage(Uri imageUri);
 
     void setStatus(String status);
+
+
 }

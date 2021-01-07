@@ -23,10 +23,32 @@ public class ContactsPresenter extends BasePresenter<ContactsActivityContract.Vi
 
 
 
-    @Override
+    /*@Override
     public void getContactList() {
         //view.showLoader();
         dataService.getContacts(new GetContactsCallback() {
+            @Override
+            public void onChange(List<User> users) {
+                if (userList == null) {
+                    view.showLoader();
+                    userList = new ArrayList<>();
+                    userList.addAll(users);
+                    view.setContactsRV(userList);
+                    view.hideLoader();
+                } else {
+                    userList.clear();
+                    userList.addAll(users);
+                    if(view != null) {
+                        view.notifyContactsAdapter();
+                    }
+                }
+            }
+        });
+    }*/
+
+    @Override
+    public void searchUsers(String s) {
+        dataService.searchContacts(s, new GetContactsCallback() {
             @Override
             public void onChange(List<User> users) {
                 if (userList == null) {

@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         mainPresenter = new MainPresenter();
 
 
-
         progressBar = findViewById(R.id.progress_bar);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -49,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         recyclerView = findViewById(R.id.main_recyclerview);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 
 
         openContactsBtn = findViewById(R.id.openContactsBtn);
@@ -63,8 +61,17 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mainPresenter.attach(this);
+        if (mainPresenter.checkSignedIn()) {
+            mainPresenter.getChats();
+        }
+    }
+
+    @Override
     public void setChatsRV(List<User> userList) {
-        chatsAdapter = new UserAdapter(this, userList,true );
+        chatsAdapter = new UserAdapter(this, userList, true);
         recyclerView.setAdapter(chatsAdapter);
     }
 
@@ -73,21 +80,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
         chatsAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mainPresenter.attach(this);
-        if(mainPresenter.checkSignedIn()) {
-            mainPresenter.getChats();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mainPresenter.deAttach();
-        Log.d(TAG, "onDestroy MainActivity ");
-    }
 
     @Override
     protected void onStop() {
@@ -181,5 +173,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityContr
     protected void onPause() {
         super.onPause();
         mainPresenter.changeStatus("offline");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mainPresenter.deAttach();
+        Log.d(TAG, "onDestroy MainActivity ");
     }
 }

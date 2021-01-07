@@ -12,6 +12,8 @@ public interface ContactsActivityContract {
     }
 
     interface Presenter {
-        void getContactList();
+        //void getContactList();
+
+        void searchUsers(String s);
     }
 }

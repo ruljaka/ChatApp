@@ -1,6 +1,8 @@
 package com.ruslangrigoriev.chatapp.contacts;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +37,9 @@ public class ContactsActivity extends AppCompatActivity implements ContactsActiv
         contactsPresenter = new ContactsPresenter();
         progressBar = findViewById(R.id.progress_bar);
 
+
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Contacts");
@@ -45,7 +50,26 @@ public class ContactsActivity extends AppCompatActivity implements ContactsActiv
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        contactsPresenter.getContactList();
+        //contactsPresenter.getContactList();
+        contactsPresenter.searchUsers("");
+
+        searchUser = findViewById(R.id.search_user);
+        searchUser.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                contactsPresenter.searchUsers(s.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     @Override
