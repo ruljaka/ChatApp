@@ -51,4 +51,7 @@ public class AuthPresenter extends BasePresenter<StartActivityContract.View> imp
         });
     }
 
+    @Override
+    public void changeStatus(String status) {
+    }
 }

@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.messaging.presenter;
+package com.ruslangrigoriev.chatapp.messaging;
 
 import android.util.Log;
 
@@ -33,8 +33,10 @@ public class MessagePresenter extends BasePresenter<MessageActivityContract.View
         dataService.getUserByID(userID, new GetUserByIDCallback() {
             @Override
             public void onChange(User user) {
-                view.setUserInfo(user);
-                getMessages(authService.getCurrentUserUID(), userID, user.getImageURL());
+                if(view != null) {
+                    view.setUserInfo(user);
+                    getMessages(authService.getCurrentUserUID(), userID, user.getImageURL());
+                }
             }
         });
     }
@@ -63,5 +65,10 @@ public class MessagePresenter extends BasePresenter<MessageActivityContract.View
                 }
             }
         });
+    }
+
+    @Override
+    public void changeStatus(String status) {
+        dataService.setStatus(status);
     }
 }

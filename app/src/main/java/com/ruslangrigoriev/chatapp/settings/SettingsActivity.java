@@ -14,6 +14,8 @@ import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity implements SettingsActivityContract.View {
 
+    private User currentUser;
+
     public SettingsPresenter settingsPresenter;
     private Toolbar toolbar;
 
@@ -26,49 +28,46 @@ public class SettingsActivity extends AppCompatActivity implements SettingsActiv
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //toolbar.setNavigationOnClickListener(v -> finish());
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        setFragment(SettingsFragment.newInstance(),"Settings");
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.settings_frame, SettingsFragment.newInstance(), SettingsFragment.newInstance().getTag())
+                .replace(R.id.settings_frame, new SettingsFragment(), null)
                 .commit();
-        getSupportActionBar().setTitle("Settings");
 
 
     }
 
-    public void setFragment(Fragment fragment, String title) {
+
+    @Override
+    public void setFragmentData(User user) {
+        FragmentManager fm = getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        Fragment currentFragment = fragments.get(fragments.size() - 1);
+        if (currentFragment instanceof SettingsFragment) {
+            ((SettingsFragment) currentFragment).setUserInfo(user);
+        } else if (currentFragment instanceof ProfileFragment) {
+            ((ProfileFragment) currentFragment).setUserInfo(user);
+        }
+
+    }
+
+    public void setFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.settings_frame, fragment, fragment.getTag())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void onProfileClick() {
+        setFragment(new ProfileFragment());
+    }
+
+    public void setTitle(String title) {
         getSupportActionBar().setTitle(title);
     }
-
-    @Override
-    public void onProfileClick() {
-        setFragment(ProfileFragment.newInstance(),"Profile");
-    }
-
-    public void onSettingsFragmentCreate() {
-        settingsPresenter.getCurrentUser();
-    }
-
-    public void setSettingsFragmentData(User user) {
-        FragmentManager fm = getSupportFragmentManager();
-        List<Fragment> fragments = fm.getFragments();
-        Fragment fragment = fragments.get(fragments.size() - 1);
-        if (fragment != null) {
-            ((SettingsFragment) fragment).setUserInfo(user);
-        }
-    }
-
 
 
     @Override
@@ -92,4 +91,17 @@ public class SettingsActivity extends AppCompatActivity implements SettingsActiv
         super.onDestroy();
         settingsPresenter.deAttach();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        settingsPresenter.changeStatus("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        settingsPresenter.changeStatus("offline");
+    }
+
 }

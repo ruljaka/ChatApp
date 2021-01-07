@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.main.view.adapters;
+package com.ruslangrigoriev.chatapp.main;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.ruslangrigoriev.chatapp.R;
+import com.ruslangrigoriev.chatapp.contacts.ContactsActivity;
 import com.ruslangrigoriev.chatapp.dao.User;
-import com.ruslangrigoriev.chatapp.messaging.view.MessageActivity;
+import com.ruslangrigoriev.chatapp.messaging.MessageActivity;
 
 import java.util.List;
 
@@ -22,10 +23,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private Context context;
     private List<User> users;
+    private boolean isChat;
 
-    public UserAdapter(Context context, List<User> users) {
+    public UserAdapter(Context context, List<User> users, boolean isChat) {
         this.context = context;
         this.users = users;
+        this.isChat = isChat;
     }
 
 
@@ -45,6 +48,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         } else {
             Glide.with(context).load(user.getImageURL()).into(holder.profileImageIv);
         }
+        if(isChat){
+            if(user.getStatus().equals("online")){
+                holder.statusOn.setVisibility(View.VISIBLE);
+                holder.statusOff.setVisibility(View.GONE);
+            } else {
+                holder.statusOn.setVisibility(View.GONE);
+                holder.statusOff.setVisibility(View.VISIBLE);
+            }
+        } else {
+            holder.statusOn.setVisibility(View.GONE);
+            holder.statusOff.setVisibility(View.GONE);
+        }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,6 +67,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 Intent intent = new Intent(context, MessageActivity.class);
                 intent.putExtra("userid",user.getId());
                 context.startActivity(intent);
+                if(context instanceof ContactsActivity){
+                    ((ContactsActivity) context).finish();
+                }
             }
         });
     }
@@ -66,6 +84,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         private TextView usernameTV;
         private ImageView profileImageIv;
+        private ImageView statusOn;
+        private ImageView statusOff;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -73,6 +93,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
             usernameTV = itemView.findViewById(R.id.username);
             profileImageIv = itemView.findViewById(R.id.profile_image);
+            statusOn = itemView.findViewById(R.id.status_on);
+            statusOff = itemView.findViewById(R.id.status_off);
 
         }
     }

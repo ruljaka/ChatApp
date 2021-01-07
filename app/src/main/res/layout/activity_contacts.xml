@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".main.view.MainActivity">
-
+    tools:context=".contacts.ContactsActivity">
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,35 +15,22 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:background="?attr/colorPrimaryVariant" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tablayout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contacts_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabIndicatorColor="@color/design_default_color_primary_dark"
-        app:tabTextColor="@color/design_default_color_primary_dark"
-        app:tabSelectedTextColor="@color/design_default_color_primary_dark"/>
+        android:layout_height="match_parent">
+    </androidx.recyclerview.widget.RecyclerView>
 
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:visibility="gone" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewpager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.viewpager2.widget.ViewPager2>
-
-
 
 </LinearLayout>

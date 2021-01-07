@@ -1,6 +1,5 @@
 package com.ruslangrigoriev.chatapp.Authentication.view;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +13,7 @@ import com.ruslangrigoriev.chatapp.Authentication.StartActivityContract;
 import com.ruslangrigoriev.chatapp.Authentication.presenter.AuthPresenter;
 import com.ruslangrigoriev.chatapp.Authentication.view.fragments.StartFragment;
 import com.ruslangrigoriev.chatapp.R;
-import com.ruslangrigoriev.chatapp.main.view.MainActivity;
+import com.ruslangrigoriev.chatapp.main.MainActivity;
 
 public class StartActivity extends AppCompatActivity implements StartActivityContract.View {
 

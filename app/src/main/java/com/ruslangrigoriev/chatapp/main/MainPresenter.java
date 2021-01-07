@@ -1,11 +1,10 @@
-package com.ruslangrigoriev.chatapp.main.presenter;
+package com.ruslangrigoriev.chatapp.main;
 
 import com.ruslangrigoriev.chatapp.App;
 import com.ruslangrigoriev.chatapp.base.BasePresenter;
 import com.ruslangrigoriev.chatapp.dao.AuthService;
 import com.ruslangrigoriev.chatapp.dao.DataService;
 import com.ruslangrigoriev.chatapp.dao.GetUsersWithChatCallback;
-import com.ruslangrigoriev.chatapp.dao.GetContactsCallback;
 import com.ruslangrigoriev.chatapp.dao.User;
 import com.ruslangrigoriev.chatapp.main.MainActivityContract;
 
@@ -16,10 +15,7 @@ public class MainPresenter extends BasePresenter<MainActivityContract.View> impl
 
     DataService dataService;
     AuthService authService;
-
-    List<User> userList;
     List<User> usersWithChatList;
-
 
 
     public MainPresenter() {
@@ -28,10 +24,12 @@ public class MainPresenter extends BasePresenter<MainActivityContract.View> impl
     }
 
     @Override
-    public void checkSignedIn() {
+    public boolean checkSignedIn() {
         if (!authService.checkSignedIn()) {
             view.startStartActivity();
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -47,7 +45,7 @@ public class MainPresenter extends BasePresenter<MainActivityContract.View> impl
     }
 
 
-    @Override
+    /*@Override
     public void getContactList() {
         //view.showLoader();
         dataService.getContacts(new GetContactsCallback() {
@@ -68,27 +66,38 @@ public class MainPresenter extends BasePresenter<MainActivityContract.View> impl
                 }
             }
         });
-    }
+    }*/
 
     @Override
     public void getChatUsersList() {
+        if(view != null){
+            view.showLoader();
+        }
         dataService.getChatUsersList(new GetUsersWithChatCallback() {
             @Override
             public void onChange(List<User> users) {
                 if (usersWithChatList == null) {
-                    //view.showLoader();
                     usersWithChatList = new ArrayList<>();
                     usersWithChatList.addAll(users);
                     view.setChatsRV(usersWithChatList);
-                    //view.hideLoader();
+                    view.hideLoader();
                 } else {
                     usersWithChatList.clear();
                     usersWithChatList.addAll(users);
-                    if(view != null) {
+                    if (view != null) {
                         view.notifyChatsAdapter();
+                        view.hideLoader();
                     }
+
                 }
             }
         });
     }
+
+    @Override
+    public void changeStatus(String status) {
+        dataService.setStatus(status);
+    }
+
+
 }

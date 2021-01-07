@@ -13,62 +13,74 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.ruslangrigoriev.chatapp.R;
 import com.ruslangrigoriev.chatapp.dao.User;
-import com.ruslangrigoriev.chatapp.messaging.view.MessageActivity;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class SettingsFragment extends Fragment {
     public static final String TAG = "SettingsFragment";
 
     private RelativeLayout profileLayout;
-    private ImageView profileImage;
+    private CircleImageView profileImage;
     private TextView username;
+
+    //private User user;
 
 
     public SettingsFragment() {
-        // Required empty public constructor
-    }
-
-    public static SettingsFragment newInstance() {
-
-        return new SettingsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*if (getActivity() != null) {
+            ((SettingsActivity) getActivity()).settingsPresenter.getCurrentUser();
+        }*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        if(getActivity() != null){
+            ((SettingsActivity)getActivity()).setTitle("Settings");
+        }
         profileLayout = view.findViewById(R.id.profile_layout);
         profileLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getActivity() != null) {
+                if (getActivity() != null) {
                     ((SettingsActivity) getActivity()).onProfileClick();
                 }
             }
         });
         profileImage = view.findViewById(R.id.profile_image);
         username = view.findViewById(R.id.username);
-        if(getActivity() != null) {
-            ((SettingsActivity) getActivity()).onSettingsFragmentCreate();
+
+        if (getActivity() != null) {
+            ((SettingsActivity) getActivity()).settingsPresenter.getCurrentUser();
         }
+        /*if(user != null) {
+            setUserInfo(user);
+        }*/
+
         return view;
     }
 
     public void setUserInfo(User user) {
         username.setText(user.getUsername());
-        if(user.getImageURL().equals("default")){
+        if (user.getImageURL().equals("default")) {
             profileImage.setImageResource(R.mipmap.ic_launcher);
         } else {
-            if(getActivity() != null) {
+            if (getActivity() != null) {
                 Glide.with(getActivity()).load(user.getImageURL()).into(profileImage);
             }
-
         }
     }
+
+    /*public void setUser(User user){
+        this.user = user;
+        setUserInfo(user);
+    }*/
+
 }

@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.messaging.view;
+package com.ruslangrigoriev.chatapp.messaging;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -17,9 +17,6 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.ruslangrigoriev.chatapp.R;
 import com.ruslangrigoriev.chatapp.dao.Chat;
 import com.ruslangrigoriev.chatapp.dao.User;
-import com.ruslangrigoriev.chatapp.messaging.MessageActivityContract;
-import com.ruslangrigoriev.chatapp.messaging.presenter.MessagePresenter;
-import com.ruslangrigoriev.chatapp.messaging.view.adapters.MessageAdapter;
 
 import java.util.List;
 
@@ -29,8 +26,10 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
 
     private CircleImageView profileIv;
     private TextView username;
+    private TextView status;
     private ImageButton btnSend;
     private MaterialEditText textSend;
+
 
     private MessagePresenter messagePresenter;
 
@@ -66,6 +65,7 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
         username = findViewById(R.id.username);
         btnSend = findViewById(R.id.btn_send);
         textSend = findViewById(R.id.text_send);
+        status = findViewById(R.id.status);
 
         Intent intent = getIntent();
         String receiverID = intent.getStringExtra("userid");
@@ -95,6 +95,7 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
         } else {
             Glide.with(MessageActivity.this).load(user.getImageURL()).into(profileIv);
         }
+        status.setText(user.getStatus());
     }
 
     @Override
@@ -135,5 +136,17 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
     public void onBackPressed() {
         super.onBackPressed();
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        messagePresenter.changeStatus("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        messagePresenter.changeStatus("offline");
     }
 }

@@ -1,10 +1,16 @@
 package com.ruslangrigoriev.chatapp.dao;
 
+import android.content.ContentResolver;
+import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -14,6 +20,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
+import com.ruslangrigoriev.chatapp.App;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,13 +33,19 @@ import java.util.List;
 public class FirebaseHelper implements AuthService, DataService {
     private static final String TAG = "MyTag";
 
+
+    String currentUID;
     FirebaseAuth firebaseAuth;
     DatabaseReference usersReference;
     DatabaseReference chatsReference;
+    StorageReference storageReference;
+
+    private StorageTask uploadTask;
 
     List<User> usersWithChatList;
 
     public FirebaseHelper() {
+        this.usersWithChatList = new ArrayList<>();
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.usersReference = FirebaseDatabase
                 .getInstance()
@@ -36,7 +53,10 @@ public class FirebaseHelper implements AuthService, DataService {
         this.chatsReference = FirebaseDatabase
                 .getInstance()
                 .getReference("Chats");
-        this.usersWithChatList = new ArrayList<>();
+        this.storageReference = FirebaseStorage
+                .getInstance()
+                .getReference("Uploads");
+
     }
 
     @Override
@@ -48,6 +68,7 @@ public class FirebaseHelper implements AuthService, DataService {
                         if (task.isSuccessful()) {
                             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                             String userID = firebaseUser.getUid();
+                            currentUID = userID;
 
                             /*userReference = FirebaseDatabase
                                     .getInstance()
@@ -64,6 +85,7 @@ public class FirebaseHelper implements AuthService, DataService {
                                             authCallback.onSuccess();
                                         }
                                     });
+                            Log.d(TAG, "register onComplete");
                         } else {
                             authCallback.onError();
                         }
@@ -77,6 +99,7 @@ public class FirebaseHelper implements AuthService, DataService {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         authCallback.onSuccess();
+                        Log.d(TAG, "login isSuccessful");
                     } else {
                         authCallback.onError();
                     }
@@ -85,17 +108,27 @@ public class FirebaseHelper implements AuthService, DataService {
 
     @Override
     public boolean checkSignedIn() {
-        return firebaseAuth.getCurrentUser() != null;
+        if (firebaseAuth.getCurrentUser() != null) {
+            currentUID = firebaseAuth.getCurrentUser().getUid();
+            Log.d(TAG, "checkSignedIn true");
+            return true;
+        }
+        Log.d(TAG, "checkSignedIn false");
+        return false;
+
     }
 
     @Override
     public void logout() {
         firebaseAuth.signOut();
+        Log.d(TAG, "logout");
     }
 
     @Override
     public String getCurrentUserUID() {
+        Log.d(TAG, "getCurrentUserUID");
         return firebaseAuth.getCurrentUser().getUid();
+
     }
 
 
@@ -110,7 +143,7 @@ public class FirebaseHelper implements AuthService, DataService {
         usersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG,"onDataChange  getContacts");
+                Log.d(TAG, "onDataChange  getContacts");
                 users.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
@@ -129,16 +162,13 @@ public class FirebaseHelper implements AuthService, DataService {
     }
 
 
-
     @Override
     public void getUserByID(String userID, GetUserByIDCallback userByIDCallback) {
-        /*usersReference = FirebaseDatabase
-                .getInstance()
-                .getReference("Users").child(userID);*/
+
         usersReference.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG,"onDataChange  getUserByID");
+                Log.d(TAG, "onDataChange  getUserByID");
 
                 User user = snapshot.getValue(User.class);
                 userByIDCallback.onChange(user);
@@ -146,7 +176,7 @@ public class FirebaseHelper implements AuthService, DataService {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "Failed to read value.", error.toException());
+                Log.d(TAG, "Failed to read value.", error.toException());
             }
         });
     }
@@ -156,8 +186,9 @@ public class FirebaseHelper implements AuthService, DataService {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
-        hashMap.put("message", message);
+        hashMap.put("messageText", message);
         chatsReference.push().setValue(hashMap);
+        Log.d(TAG, "sendMessage");
     }
 
     @Override
@@ -166,12 +197,12 @@ public class FirebaseHelper implements AuthService, DataService {
         chatsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG,"onDataChange  readMessage");
+                Log.d(TAG, "onDataChange  readMessage");
                 chats.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Chat chat = dataSnapshot.getValue(Chat.class);
                     if (chat.getReceiver().equals(myID) && chat.getSender().equals(userID)
-                    || chat.getReceiver().equals(userID) && chat.getSender().equals(myID)) {
+                            || chat.getReceiver().equals(userID) && chat.getSender().equals(myID)) {
                         chats.add(chat);
                     }
                 }
@@ -192,20 +223,19 @@ public class FirebaseHelper implements AuthService, DataService {
         chatsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG,"onDataChange  getChatUsersList");
                 chatedUsersIDsList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Chat chat = dataSnapshot.getValue(Chat.class);
-                    if (chat.getSender().equals(getCurrentUserUID())){
+                    if (chat.getSender().equals(currentUID)) {
                         chatedUsersIDsList.add(chat.getReceiver());
                     }
-                    if(chat.getReceiver().equals(getCurrentUserUID())){
+                    if (chat.getReceiver().equals(currentUID)) {
                         chatedUsersIDsList.add(chat.getSender());
                     }
                 }
-                
+
                 readChats(chatedUsersIDsList, chatUsersCallback);
-                Log.d(TAG,"onDataChange  getChatUsersList");
+                Log.d(TAG, "onDataChange  getChatUsersList");
             }
 
             @Override
@@ -220,23 +250,22 @@ public class FirebaseHelper implements AuthService, DataService {
         usersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG,"onDataChange  readChats");
 
                 usersWithChatList.clear();
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    for(String ID : chatedUsersList){
-                        if(user.getId().equals(ID)){
-                            if(!usersWithChatList.contains(user)){
+                    for (String ID : chatedUsersList) {
+                        if (user.getId().equals(ID)) {
+                            if (!usersWithChatList.contains(user)) {
                                 usersWithChatList.add(user);
                             }
                         }
                     }
                 }
                 usersWithChatCallback.onChange(usersWithChatList);
-                Log.d(TAG,"onDataChange  readChats");
+                Log.d(TAG, "onDataChange  readChats");
             }
 
             @Override
@@ -244,6 +273,61 @@ public class FirebaseHelper implements AuthService, DataService {
 
             }
         });
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = App.getInstance().getApplicationContext().getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    @Override
+    public void uploadImage(Uri imageUri) {
+        if (imageUri != null) {
+            StorageReference fileReference = storageReference.child((System.currentTimeMillis())
+                    + "." + getFileExtension(imageUri));
+            uploadTask = fileReference.putFile(imageUri);
+            uploadTask.continueWithTask((Continuation<UploadTask.TaskSnapshot, Task<Uri>>) task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return fileReference.getDownloadUrl();
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        String uri = downloadUri.toString();
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("imageURL", uri);
+                        usersReference.child(currentUID).updateChildren(map);
+                        Log.d(TAG, "onComplete  uploadImage");
+                    } else {
+                        Log.d(TAG, "downloadImage Failed");
+                        Toast.makeText(App.getInstance().getApplicationContext(), "downloadImage Failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "onFailure  uploadImage");
+                    Toast.makeText(App.getInstance().getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(App.getInstance().getApplicationContext(), "No image selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void setStatus(String status) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+        if(currentUID != null) {
+            usersReference.child(currentUID).updateChildren(hashMap);
+            Log.d(TAG, "setStatus " + status);
+        }
+
     }
 
 

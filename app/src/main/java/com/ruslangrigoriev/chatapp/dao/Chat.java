@@ -3,12 +3,12 @@ package com.ruslangrigoriev.chatapp.dao;
 public class Chat {
     private String sender;
     private String receiver;
-    private String message;
+    private String messageText;
 
-    public Chat(String sender, String receiver, String message) {
+    public Chat(String sender, String receiver, String messageText) {
         this.sender = sender;
         this.receiver = receiver;
-        this.message = message;
+        this.messageText = messageText;
     }
 
     public Chat() {
@@ -30,11 +30,11 @@ public class Chat {
         this.receiver = receiver;
     }
 
-    public String getMessage() {
-        return message;
+    public String getMessageText() {
+        return messageText;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
     }
 }

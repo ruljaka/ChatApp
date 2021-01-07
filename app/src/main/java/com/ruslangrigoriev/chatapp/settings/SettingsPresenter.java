@@ -1,5 +1,7 @@
 package com.ruslangrigoriev.chatapp.settings;
 
+import android.net.Uri;
+
 import com.ruslangrigoriev.chatapp.App;
 import com.ruslangrigoriev.chatapp.base.BasePresenter;
 import com.ruslangrigoriev.chatapp.dao.AuthService;
@@ -23,8 +25,20 @@ public class SettingsPresenter extends BasePresenter<SettingsActivityContract.Vi
         dataService.getUserByID(authService.getCurrentUserUID(), new GetUserByIDCallback() {
             @Override
             public void onChange(User user) {
-                view.setSettingsFragmentData(user);
+                if(view != null) {
+                    view.setFragmentData(user);
+                }
             }
         });
+    }
+
+    @Override
+    public void uploadImage(Uri imageUri) {
+        dataService.uploadImage(imageUri);
+    }
+
+    @Override
+    public void changeStatus(String status) {
+        dataService.setStatus(status);
     }
 }

@@ -1,6 +1,6 @@
 package com.ruslangrigoriev.chatapp.settings;
 
-import androidx.fragment.app.Fragment;
+import android.net.Uri;
 
 import com.ruslangrigoriev.chatapp.base.IView;
 import com.ruslangrigoriev.chatapp.dao.User;
@@ -8,16 +8,14 @@ import com.ruslangrigoriev.chatapp.dao.User;
 public interface SettingsActivityContract {
 
     interface View extends IView {
-
-        void setSettingsFragmentData(User user);
-
-        void onProfileClick();
+        void setFragmentData(User user);
     }
 
 
     interface Presenter {
         void getCurrentUser();
 
+        void uploadImage(Uri imageUri);
     }
 
 }

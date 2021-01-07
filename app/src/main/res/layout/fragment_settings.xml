@@ -14,8 +14,8 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image"
             android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@mipmap/ic_launcher" />
+            android:layout_height="60dp"/>
+            <!--android:src="@mipmap/ic_launcher" />-->
 
 
         <TextView
@@ -25,7 +25,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
             android:layout_toEndOf="@id/profile_image"
-            android:text="username"
+            android:text=""
             android:textSize="22sp" />
     </RelativeLayout>
 

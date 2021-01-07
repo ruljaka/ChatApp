@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.messaging.view.adapters;
+package com.ruslangrigoriev.chatapp.messaging;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -48,7 +48,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = chats.get(position);
 
-        holder.showMsgTV.setText(chat.getMessage());
+        holder.showMsgTV.setText(chat.getMessageText());
 
         if(imageURL.equals("default")){
             holder.profileIV.setImageResource(R.mipmap.ic_launcher);
