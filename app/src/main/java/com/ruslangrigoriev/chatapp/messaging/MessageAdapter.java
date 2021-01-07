@@ -24,6 +24,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private Context context;
     private List<Message> chats;
     private String imageURL;
+    String currentID = App.getInstance().authService.getCurrentUserUID();
 
     public MessageAdapter(Context context, List<Message> chats, String imageURL) {
         this.context = context;
@@ -46,14 +47,25 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Message chat = chats.get(position);
+        Message message = chats.get(position);
 
-        holder.showMsgTV.setText(chat.getMessageText());
+        holder.showMsgTV.setText(message.getMessageText());
 
         if(imageURL.equals("default")){
             holder.profileIV.setImageResource(R.mipmap.ic_launcher);
         } else {
             Glide.with(context).load(imageURL).into(holder.profileIV);
+        }
+
+        if(message.getSender().equals(currentID)) {
+            holder.txtSeen.setVisibility(View.VISIBLE);
+            if(message.getIsSeen()){
+                holder.txtSeen.setText("✓✓");
+            } else {
+                holder.txtSeen.setText(" ✓");
+            }
+        } else {
+            holder.txtSeen.setVisibility(View.GONE);
         }
     }
 
@@ -67,6 +79,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         private TextView showMsgTV;
         private ImageView profileIV;
+        private TextView txtSeen;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -74,13 +87,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
             showMsgTV = itemView.findViewById(R.id.show_message);
             profileIV = itemView.findViewById(R.id.profile_image);
+            txtSeen = itemView.findViewById(R.id.txt_seen);
 
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(chats.get(position).getSender().equals(App.getInstance().authService.getCurrentUserUID())){
+        if(chats.get(position).getSender().equals(currentID)){
             return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;

@@ -41,6 +41,8 @@ public class FirebaseHelper implements AuthService, DataService {
     DatabaseReference messagesReference;
     StorageReference storageReference;
 
+    ValueEventListener seenListener;
+
     private StorageTask uploadTask;
 
     List<User> chatList;
@@ -163,19 +165,19 @@ public class FirebaseHelper implements AuthService, DataService {
         });
     }*/
 
-    public void searchContacts(String s, GetContactsCallback contactsCallback){
+    public void searchContacts(String s, GetContactsCallback contactsCallback) {
         List<User> users = new ArrayList<>();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         Query query = usersReference.orderByChild("search")
                 .startAt(s)
-                .endAt(s+"\uf8ff");
+                .endAt(s + "\uf8ff");
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
-                    if(user != null) {
+                    if (user != null) {
                         if (!user.getId().equals(firebaseUser.getUid())) {
                             users.add(user);
                         }
@@ -214,11 +216,40 @@ public class FirebaseHelper implements AuthService, DataService {
     }
 
     @Override
+    public void seenMessage(String userID) {
+        seenListener = messagesReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange  seenMessage");
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Message message = snapshot.getValue(Message.class);
+                    if (message.getReceiver().equals(currentUID) && message.getSender().equals(userID)) {
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("isSeen", true);
+                        snapshot.getRef().updateChildren(hashMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void removeSeenListener() {
+        messagesReference.removeEventListener(seenListener);
+    }
+
+    @Override
     public void sendMessage(String sender, String receiver, String message) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("messageText", message);
+        hashMap.put("isSeen", false);
         messagesReference.push().setValue(hashMap);
         Log.d(TAG, "sendMessage");
     }
@@ -228,11 +259,11 @@ public class FirebaseHelper implements AuthService, DataService {
         ArrayList<Message> messages = new ArrayList<>();
         messagesReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d(TAG, "onDataChange  readMessage");
                 messages.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Message message = dataSnapshot.getValue(Message.class);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Message message = snapshot.getValue(Message.class);
                     if (message.getReceiver().equals(myID) && message.getSender().equals(userID)
                             || message.getReceiver().equals(userID) && message.getSender().equals(myID)) {
                         messages.add(message);
@@ -276,6 +307,7 @@ public class FirebaseHelper implements AuthService, DataService {
             }
         });
     }
+
 
     private void readChats(ArrayList<String> chatedUsersList, GetChatsCallback getChatsCallback) {
 
@@ -355,7 +387,7 @@ public class FirebaseHelper implements AuthService, DataService {
     public void setStatus(String status) {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("status", status);
-        if(currentUID != null) {
+        if (currentUID != null) {
             usersReference.child(currentUID).updateChildren(hashMap);
             Log.d(TAG, "setStatus " + status);
         }

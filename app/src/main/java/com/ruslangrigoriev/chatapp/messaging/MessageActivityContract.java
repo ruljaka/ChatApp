@@ -10,14 +10,22 @@ public interface MessageActivityContract {
 
     interface View extends IView {
         void setUserInfo(User user);
+
         void setRecyclerView(List<Message> chats);
+
         void notifyAdapter();
     }
 
     interface Presenter {
         void getUserByID(String userID);
-        void onBtnSend(String receiverID,String msg);
+
+        void onBtnSend(String receiverID, String msg);
+
         void getMessages(String myID, String userID, String imageURL);
+
+        void removeSeenListener();
+
+        void seenMessage(String userID);
     }
 
 }

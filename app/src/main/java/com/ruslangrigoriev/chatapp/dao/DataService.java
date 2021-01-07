@@ -20,5 +20,9 @@ public interface DataService {
 
     void setStatus(String status);
 
+    void seenMessage(String userID);
+
+    void removeSeenListener();
+
 
 }

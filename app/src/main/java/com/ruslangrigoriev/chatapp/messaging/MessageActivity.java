@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.ruslangrigoriev.chatapp.R;
 import com.ruslangrigoriev.chatapp.dao.Message;
@@ -41,6 +42,8 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
     private User user;
 
     Intent intent;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,7 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
         String receiverID = intent.getStringExtra("userid");
 
         messagePresenter.getUserByID(receiverID);
+        messagePresenter.seenMessage(receiverID);
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +89,7 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
             }
         });
     }
+
 
     @Override
     public void setUserInfo(User user) {
@@ -148,5 +153,6 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
     protected void onPause() {
         super.onPause();
         messagePresenter.changeStatus("offline");
+        messagePresenter.removeSeenListener();
     }
 }

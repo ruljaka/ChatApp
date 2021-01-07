@@ -65,7 +65,19 @@ public class MessagePresenter extends BasePresenter<MessageActivityContract.View
     }
 
     @Override
+    public void removeSeenListener() {
+        dataService.removeSeenListener();
+    }
+
+    @Override
+    public void seenMessage(String userID) {
+        dataService.seenMessage(userID);
+    }
+
+    @Override
     public void changeStatus(String status) {
         dataService.setStatus(status);
     }
+
+
 }
