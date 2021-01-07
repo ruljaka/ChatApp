@@ -23,7 +23,7 @@ public interface MainActivityContract {
 
         boolean checkSignedIn();
 
-        void getChatUsersList();
+        void getChats();
 
     }
 }

@@ -1,16 +1,13 @@
 package com.ruslangrigoriev.chatapp.messaging;
 
-import android.util.Log;
-
 import com.ruslangrigoriev.chatapp.App;
 import com.ruslangrigoriev.chatapp.base.BasePresenter;
 import com.ruslangrigoriev.chatapp.dao.AuthService;
-import com.ruslangrigoriev.chatapp.dao.Chat;
+import com.ruslangrigoriev.chatapp.dao.Message;
 import com.ruslangrigoriev.chatapp.dao.DataService;
 import com.ruslangrigoriev.chatapp.dao.GetUserByIDCallback;
 import com.ruslangrigoriev.chatapp.dao.ReadMessageCallback;
 import com.ruslangrigoriev.chatapp.dao.User;
-import com.ruslangrigoriev.chatapp.messaging.MessageActivityContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +17,7 @@ public class MessagePresenter extends BasePresenter<MessageActivityContract.View
     DataService dataService;
     AuthService authService;
 
-    List<Chat> chatList;
+    List<Message> chatList;
 
     public MessagePresenter() {
         this.dataService = App.getInstance().dataService;
@@ -50,7 +47,7 @@ public class MessagePresenter extends BasePresenter<MessageActivityContract.View
     public void getMessages(String myID, String userID, String imageURL) {
         dataService.readMessage(myID, userID, imageURL, new ReadMessageCallback() {
             @Override
-            public void onChange(List<Chat> chats) {
+            public void onChange(List<Message> chats) {
                 if (view != null) {
                     if (chatList == null) {
                         chatList = new ArrayList<>();

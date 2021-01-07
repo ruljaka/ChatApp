@@ -1,17 +1,17 @@
 package com.ruslangrigoriev.chatapp.dao;
 
-public class Chat {
+public class Message {
     private String sender;
     private String receiver;
     private String messageText;
 
-    public Chat(String sender, String receiver, String messageText) {
+    public Message(String sender, String receiver, String messageText) {
         this.sender = sender;
         this.receiver = receiver;
         this.messageText = messageText;
     }
 
-    public Chat() {
+    public Message() {
     }
 
     public String getSender() {

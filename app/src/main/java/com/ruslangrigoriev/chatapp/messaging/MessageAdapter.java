@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.ruslangrigoriev.chatapp.App;
 import com.ruslangrigoriev.chatapp.R;
-import com.ruslangrigoriev.chatapp.dao.Chat;
+import com.ruslangrigoriev.chatapp.dao.Message;
 
 import java.util.List;
 
@@ -22,10 +22,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public static final int MSG_TYPE_RIGHT = 1;
 
     private Context context;
-    private List<Chat> chats;
+    private List<Message> chats;
     private String imageURL;
 
-    public MessageAdapter(Context context, List<Chat> chats, String imageURL) {
+    public MessageAdapter(Context context, List<Message> chats, String imageURL) {
         this.context = context;
         this.chats = chats;
         this.imageURL = imageURL;
@@ -46,7 +46,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Chat chat = chats.get(position);
+        Message chat = chats.get(position);
 
         holder.showMsgTV.setText(chat.getMessageText());
 

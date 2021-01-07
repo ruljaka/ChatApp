@@ -12,7 +12,7 @@ public interface DataService {
 
     void readMessage(String myID, String userID, String imageURL, ReadMessageCallback readMessageCallback);
 
-    void getChatUsersList(GetUsersWithChatCallback chatUsersCallback);
+    void getChats(GetChatsCallback chatUsersCallback);
 
     void uploadImage(Uri imageUri);
 

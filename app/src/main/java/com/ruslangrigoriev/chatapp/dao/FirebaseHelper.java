@@ -37,22 +37,22 @@ public class FirebaseHelper implements AuthService, DataService {
     String currentUID;
     FirebaseAuth firebaseAuth;
     DatabaseReference usersReference;
-    DatabaseReference chatsReference;
+    DatabaseReference messagesReference;
     StorageReference storageReference;
 
     private StorageTask uploadTask;
 
-    List<User> usersWithChatList;
+    List<User> chatList;
 
     public FirebaseHelper() {
-        this.usersWithChatList = new ArrayList<>();
+        this.chatList = new ArrayList<>();
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.usersReference = FirebaseDatabase
                 .getInstance()
                 .getReference("Users");
-        this.chatsReference = FirebaseDatabase
+        this.messagesReference = FirebaseDatabase
                 .getInstance()
-                .getReference("Chats");
+                .getReference("Messages");
         this.storageReference = FirebaseStorage
                 .getInstance()
                 .getReference("Uploads");
@@ -187,26 +187,26 @@ public class FirebaseHelper implements AuthService, DataService {
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("messageText", message);
-        chatsReference.push().setValue(hashMap);
+        messagesReference.push().setValue(hashMap);
         Log.d(TAG, "sendMessage");
     }
 
     @Override
     public void readMessage(String myID, String userID, String imageURL, ReadMessageCallback readMessageCallback) {
-        ArrayList<Chat> chats = new ArrayList<>();
-        chatsReference.addValueEventListener(new ValueEventListener() {
+        ArrayList<Message> messages = new ArrayList<>();
+        messagesReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d(TAG, "onDataChange  readMessage");
-                chats.clear();
+                messages.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Chat chat = dataSnapshot.getValue(Chat.class);
-                    if (chat.getReceiver().equals(myID) && chat.getSender().equals(userID)
-                            || chat.getReceiver().equals(userID) && chat.getSender().equals(myID)) {
-                        chats.add(chat);
+                    Message message = dataSnapshot.getValue(Message.class);
+                    if (message.getReceiver().equals(myID) && message.getSender().equals(userID)
+                            || message.getReceiver().equals(userID) && message.getSender().equals(myID)) {
+                        messages.add(message);
                     }
                 }
-                readMessageCallback.onChange(chats);
+                readMessageCallback.onChange(messages);
             }
 
             @Override
@@ -217,24 +217,24 @@ public class FirebaseHelper implements AuthService, DataService {
     }
 
     @Override
-    public void getChatUsersList(GetUsersWithChatCallback chatUsersCallback) {
+    public void getChats(GetChatsCallback getChatsCallback) {
         ArrayList<String> chatedUsersIDsList = new ArrayList<>();
 
-        chatsReference.addValueEventListener(new ValueEventListener() {
+        messagesReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 chatedUsersIDsList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Chat chat = dataSnapshot.getValue(Chat.class);
-                    if (chat.getSender().equals(currentUID)) {
-                        chatedUsersIDsList.add(chat.getReceiver());
+                    Message message = dataSnapshot.getValue(Message.class);
+                    if (message.getSender().equals(currentUID)) {
+                        chatedUsersIDsList.add(message.getReceiver());
                     }
-                    if (chat.getReceiver().equals(currentUID)) {
-                        chatedUsersIDsList.add(chat.getSender());
+                    if (message.getReceiver().equals(currentUID)) {
+                        chatedUsersIDsList.add(message.getSender());
                     }
                 }
 
-                readChats(chatedUsersIDsList, chatUsersCallback);
+                readChats(chatedUsersIDsList, getChatsCallback);
                 Log.d(TAG, "onDataChange  getChatUsersList");
             }
 
@@ -245,26 +245,26 @@ public class FirebaseHelper implements AuthService, DataService {
         });
     }
 
-    private void readChats(ArrayList<String> chatedUsersList, GetUsersWithChatCallback usersWithChatCallback) {
+    private void readChats(ArrayList<String> chatedUsersList, GetChatsCallback getChatsCallback) {
 
         usersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                usersWithChatList.clear();
+                chatList.clear();
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
                     for (String ID : chatedUsersList) {
                         if (user.getId().equals(ID)) {
-                            if (!usersWithChatList.contains(user)) {
-                                usersWithChatList.add(user);
+                            if (!chatList.contains(user)) {
+                                chatList.add(user);
                             }
                         }
                     }
                 }
-                usersWithChatCallback.onChange(usersWithChatList);
+                getChatsCallback.onChange(chatList);
                 Log.d(TAG, "onDataChange  readChats");
             }
 

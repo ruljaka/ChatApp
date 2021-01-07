@@ -4,9 +4,8 @@ import com.ruslangrigoriev.chatapp.App;
 import com.ruslangrigoriev.chatapp.base.BasePresenter;
 import com.ruslangrigoriev.chatapp.dao.AuthService;
 import com.ruslangrigoriev.chatapp.dao.DataService;
-import com.ruslangrigoriev.chatapp.dao.GetUsersWithChatCallback;
+import com.ruslangrigoriev.chatapp.dao.GetChatsCallback;
 import com.ruslangrigoriev.chatapp.dao.User;
-import com.ruslangrigoriev.chatapp.main.MainActivityContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,7 @@ public class MainPresenter extends BasePresenter<MainActivityContract.View> impl
 
     DataService dataService;
     AuthService authService;
-    List<User> usersWithChatList;
+    List<User> chatList;
 
 
     public MainPresenter() {
@@ -69,21 +68,21 @@ public class MainPresenter extends BasePresenter<MainActivityContract.View> impl
     }*/
 
     @Override
-    public void getChatUsersList() {
+    public void getChats() {
         if(view != null){
             view.showLoader();
         }
-        dataService.getChatUsersList(new GetUsersWithChatCallback() {
+        dataService.getChats(new GetChatsCallback() {
             @Override
             public void onChange(List<User> users) {
-                if (usersWithChatList == null) {
-                    usersWithChatList = new ArrayList<>();
-                    usersWithChatList.addAll(users);
-                    view.setChatsRV(usersWithChatList);
+                if (chatList == null) {
+                    chatList = new ArrayList<>();
+                    chatList.addAll(users);
+                    view.setChatsRV(chatList);
                     view.hideLoader();
                 } else {
-                    usersWithChatList.clear();
-                    usersWithChatList.addAll(users);
+                    chatList.clear();
+                    chatList.addAll(users);
                     if (view != null) {
                         view.notifyChatsAdapter();
                         view.hideLoader();

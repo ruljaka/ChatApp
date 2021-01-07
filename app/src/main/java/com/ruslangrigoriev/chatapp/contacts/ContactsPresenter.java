@@ -5,9 +5,7 @@ import com.ruslangrigoriev.chatapp.base.BasePresenter;
 import com.ruslangrigoriev.chatapp.dao.AuthService;
 import com.ruslangrigoriev.chatapp.dao.DataService;
 import com.ruslangrigoriev.chatapp.dao.GetContactsCallback;
-import com.ruslangrigoriev.chatapp.dao.GetUsersWithChatCallback;
 import com.ruslangrigoriev.chatapp.dao.User;
-import com.ruslangrigoriev.chatapp.main.MainActivityContract;
 
 import java.util.ArrayList;
 import java.util.List;

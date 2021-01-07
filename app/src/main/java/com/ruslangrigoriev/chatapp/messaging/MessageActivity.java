@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.ruslangrigoriev.chatapp.R;
-import com.ruslangrigoriev.chatapp.dao.Chat;
+import com.ruslangrigoriev.chatapp.dao.Message;
 import com.ruslangrigoriev.chatapp.dao.User;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
     private MessagePresenter messagePresenter;
 
     private MessageAdapter messageAdapter;
-    private List<Chat> chatList;
+    private List<Message> chatList;
 
     private RecyclerView recyclerView;
 
@@ -99,7 +99,7 @@ public class MessageActivity extends AppCompatActivity implements MessageActivit
     }
 
     @Override
-    public void setRecyclerView(List<Chat> chats) {
+    public void setRecyclerView(List<Message> chats) {
         messageAdapter = new MessageAdapter(this,chats,user.getImageURL());
         recyclerView.setAdapter(messageAdapter);
     }
