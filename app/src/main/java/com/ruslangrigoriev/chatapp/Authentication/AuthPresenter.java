@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.Authentication.presenter;
+package com.ruslangrigoriev.chatapp.Authentication;
 
 import com.ruslangrigoriev.chatapp.App;
 import com.ruslangrigoriev.chatapp.Authentication.StartActivityContract;
@@ -53,5 +53,9 @@ public class AuthPresenter extends BasePresenter<StartActivityContract.View> imp
 
     @Override
     public void changeStatus(String status) {
+    }
+
+    public void onClickReset(String email) {
+        authService.resetPassword(email);
     }
 }

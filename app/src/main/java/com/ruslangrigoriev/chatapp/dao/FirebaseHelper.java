@@ -39,16 +39,18 @@ public class FirebaseHelper implements AuthService, DataService {
     FirebaseAuth firebaseAuth;
     DatabaseReference usersReference;
     DatabaseReference messagesReference;
+    DatabaseReference chatsReference;
     StorageReference storageReference;
+
 
     ValueEventListener seenListener;
 
     private StorageTask uploadTask;
 
-    List<User> chatList;
+    List<User> userListFromChats;
 
     public FirebaseHelper() {
-        this.chatList = new ArrayList<>();
+        this.userListFromChats = new ArrayList<>();
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.usersReference = FirebaseDatabase
                 .getInstance()
@@ -135,35 +137,21 @@ public class FirebaseHelper implements AuthService, DataService {
 
     }
 
-
-    /*@Override
-    public void getContacts(GetContactsCallback contactsCallback) {
-        List<User> users = new ArrayList<>();
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        *//*usersReference = FirebaseDatabase
-                .getInstance()
-                .getReference("Users");*//*
-
-        usersReference.addValueEventListener(new ValueEventListener() {
+    @Override
+    public void resetPassword(String email) {
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "onDataChange  getContacts");
-                users.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    if (!user.getId().equals(firebaseUser.getUid())) {
-                        users.add(user);
-                    }
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(App.getInstance().getApplicationContext(), "Please check your Email", Toast.LENGTH_SHORT).show();
+                } else {
+                    String error = task.getException().getMessage();
+                    Toast.makeText(App.getInstance().getApplicationContext(), error, Toast.LENGTH_SHORT).show();
                 }
-                contactsCallback.onChange(users);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w(TAG, "Failed to read value.", error.toException());
             }
         });
-    }*/
+    }
+
 
     public void searchContacts(String s, GetContactsCallback contactsCallback) {
         List<User> users = new ArrayList<>();
@@ -252,6 +240,24 @@ public class FirebaseHelper implements AuthService, DataService {
         hashMap.put("isSeen", false);
         messagesReference.push().setValue(hashMap);
         Log.d(TAG, "sendMessage");
+
+        chatsReference = FirebaseDatabase.getInstance().getReference("ChatList")
+                .child(sender)
+                .child(receiver);
+
+        chatsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) {
+                    chatsReference.child("id").setValue(receiver);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -281,59 +287,48 @@ public class FirebaseHelper implements AuthService, DataService {
 
     @Override
     public void getChats(GetChatsCallback getChatsCallback) {
-        ArrayList<String> chatedUsersIDsList = new ArrayList<>();
+        ArrayList<ChatList> chats = new ArrayList<>();
 
-        messagesReference.addValueEventListener(new ValueEventListener() {
+        chatsReference = FirebaseDatabase.getInstance().getReference("ChatList").child(getCurrentUserUID());
+        chatsReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                chatedUsersIDsList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Message message = dataSnapshot.getValue(Message.class);
-                    if (message.getSender().equals(currentUID)) {
-                        chatedUsersIDsList.add(message.getReceiver());
-                    }
-                    if (message.getReceiver().equals(currentUID)) {
-                        chatedUsersIDsList.add(message.getSender());
-                    }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                chats.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    ChatList chatlist = snapshot.getValue(ChatList.class);
+                    chats.add(chatlist);
                 }
-
-                readChats(chatedUsersIDsList, getChatsCallback);
-                Log.d(TAG, "onDataChange  getChatUsersList");
+                getUserListFromChats(chats, getChatsCallback);
+                Log.d(TAG, "onDataChange  getChats");
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
     }
 
 
-    private void readChats(ArrayList<String> chatedUsersList, GetChatsCallback getChatsCallback) {
-
+    private void getUserListFromChats(ArrayList<ChatList> chats, GetChatsCallback getChatsCallback) {
         usersReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                chatList.clear();
-
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
-
-                    for (String ID : chatedUsersList) {
-                        if (user.getId().equals(ID)) {
-                            if (!chatList.contains(user)) {
-                                chatList.add(user);
-                            }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                userListFromChats.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    User user = snapshot.getValue(User.class);
+                    for (ChatList chatlist : chats) {
+                        if (user.getId().equals(chatlist.getId())) {
+                            userListFromChats.add(user);
                         }
                     }
                 }
-                getChatsCallback.onChange(chatList);
-                Log.d(TAG, "onDataChange  readChats");
+                getChatsCallback.onChange(userListFromChats);
+                Log.d(TAG, "onDataChange  getUserListFromChats");
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });

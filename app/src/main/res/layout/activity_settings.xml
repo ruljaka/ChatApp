@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Authentication.view.StartActivity">
+    tools:context=".Authentication.StartActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

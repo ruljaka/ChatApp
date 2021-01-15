@@ -16,7 +16,7 @@
         <activity android:name=".contacts.ContactsActivity" />
         <activity android:name=".settings.SettingsActivity" />
         <activity android:name=".messaging.MessageActivity" />
-        <activity android:name=".Authentication.view.StartActivity" />
+        <activity android:name=".Authentication.StartActivity" />
         <activity android:name=".main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

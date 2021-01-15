@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.ruslangrigoriev.chatapp.Authentication.view.StartActivity;
+import com.ruslangrigoriev.chatapp.Authentication.StartActivity;
 import com.ruslangrigoriev.chatapp.R;
 import com.ruslangrigoriev.chatapp.contacts.ContactsActivity;
 import com.ruslangrigoriev.chatapp.dao.User;

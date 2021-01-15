@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.Authentication.view.fragments;
+package com.ruslangrigoriev.chatapp.Authentication;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,13 +17,8 @@ import androidx.fragment.app.Fragment;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.ruslangrigoriev.chatapp.R;
-import com.ruslangrigoriev.chatapp.Authentication.view.StartActivity;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RegisterFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class RegisterFragment extends Fragment {
     public static final String TAG = "RegisterFragment";
 
@@ -41,7 +36,6 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override

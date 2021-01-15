@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.Authentication.view;
+package com.ruslangrigoriev.chatapp.Authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.ruslangrigoriev.chatapp.Authentication.StartActivityContract;
-import com.ruslangrigoriev.chatapp.Authentication.presenter.AuthPresenter;
-import com.ruslangrigoriev.chatapp.Authentication.view.fragments.StartFragment;
+import com.ruslangrigoriev.chatapp.Authentication.AuthPresenter;
+import com.ruslangrigoriev.chatapp.Authentication.StartFragment;
 import com.ruslangrigoriev.chatapp.R;
 import com.ruslangrigoriev.chatapp.main.MainActivity;
 

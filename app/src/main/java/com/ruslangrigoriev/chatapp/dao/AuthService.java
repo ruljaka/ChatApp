@@ -10,5 +10,7 @@ public interface AuthService {
     void logout();
 
     String getCurrentUserUID();
+
+    void resetPassword(String email);
 }
 

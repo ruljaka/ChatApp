@@ -1,4 +1,4 @@
-package com.ruslangrigoriev.chatapp.Authentication.view.fragments;
+package com.ruslangrigoriev.chatapp.Authentication;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.ruslangrigoriev.chatapp.Authentication.view.StartActivity;
 import com.ruslangrigoriev.chatapp.R;
 
 /**
